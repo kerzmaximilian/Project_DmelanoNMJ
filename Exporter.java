@@ -1,4 +1,5 @@
 package Util;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,12 +12,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import UI.Display;
+
 public class Exporter {
 
 	private File file;
 	private boolean graphValsBoo = false;
 	private boolean trueValsBoo = false;
-	private float percent=0;
+	private float percent = 0;
+
 	public Exporter(File file) {
 
 		this.file = file;
@@ -38,39 +42,39 @@ public class Exporter {
 		if (file.getPath().contains(".fly")) {
 
 			int[][] comps = fly.getComponents();
-			short[][] gV=new short[0][];
+			short[][] gV = new short[0][];
 			if (graphValsBoo == true)
 				gV = fly.getGraphVals();
 			short[][] gD = fly.getGraphData();
-			short[][] tV= new short[0][];
+			short[][] tV = new short[0][];
 			if (trueValsBoo == true)
 				tV = fly.getTrueVals();
-			float multiplier = (float)(100f/(gV.length+gD.length+tV.length+4f));
+			float multiplier = (float) (100f / (gV.length + gD.length
+					+ tV.length + 4f));
 
 			FileWriter fw = new FileWriter(file);
 			BufferedWriter bw = new BufferedWriter(fw);
-
+			Display.setProgBar(5);
+			
 			bw.write("FLAG:Title");
-			percent+=multiplier;
+			percent += multiplier;
 			bw.newLine();
 			bw.write(fly.getTitle());
 			bw.newLine();
 			bw.write("FLAG:Img");
-			percent+=multiplier;
+			percent += multiplier;
 			bw.newLine();
-			if (fly.getImg() != null) {
-				bw.write(fly.getImgTitle());
-				bw.newLine();
-			}
+			bw.write(fly.getImgTitle());
+			bw.newLine();
 			bw.write("FLAG:Notes");
-			percent+=multiplier;
+			percent += multiplier;
 			bw.newLine();
 			if (fly.getNotes() != null) {
 				bw.write(fly.getNotes());
 				bw.newLine();
 			}
 			bw.write("FLAG:Components");
-			percent+=multiplier;
+			percent += multiplier;
 			bw.newLine();
 			for (int i = 0; i < comps.length; i++) {
 				String line = Integer.toString(comps[i][0]);
@@ -80,6 +84,7 @@ public class Exporter {
 				bw.write(line);
 				bw.newLine();
 			}
+			Display.setProgBar(5);
 			bw.write("FLAG:GraphVals");
 			bw.newLine();
 			if (graphValsBoo == true) {
@@ -90,7 +95,7 @@ public class Exporter {
 					}
 					bw.write(line);
 					bw.newLine();
-					percent+=multiplier;
+					percent += multiplier;
 				}
 			}
 			bw.write("FLAG:GraphData");
@@ -102,8 +107,9 @@ public class Exporter {
 				}
 				bw.write(line);
 				bw.newLine();
-				percent+=multiplier;
+				percent += multiplier;
 			}
+			Display.setProgBar(15);
 			bw.write("FLAG:TrueVals");
 			bw.newLine();
 			if (trueValsBoo == true) {
@@ -114,7 +120,7 @@ public class Exporter {
 					}
 					bw.write(line);
 					bw.newLine();
-					percent+=multiplier;
+					percent += multiplier;
 				}
 			}
 			bw.write("FLAG:END");
@@ -168,9 +174,11 @@ public class Exporter {
 				.println("EXPORTER: " + fly.getTitle() + " exported as .csv.");
 	}
 
+	//UNUSED, STILL!!!!!
 	public void log() {
 
 		try {
+			@SuppressWarnings({ "resource", "unused" })
 			BufferedReader reader = new BufferedReader(new FileReader(
 					DmelanoNMJ.xsrcPath + "/log.txt"));
 
@@ -180,11 +188,11 @@ public class Exporter {
 		}
 	}
 
-	//getters
-	public int getStatus(){
-		return (int)percent;
+	// getters
+	public int getStatus() {
+		return (int) percent;
 	}
-	
+
 	// setters
 
 	public void setGraphValsExport(boolean boo) {

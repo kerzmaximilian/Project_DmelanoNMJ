@@ -1,7 +1,6 @@
 package Util;
-import ij.ImagePlus;
 
-import java.awt.Graphics2D;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBException;
 
 import UI.Display;
@@ -43,14 +41,17 @@ public class DmelanoNMJ {
 			reader.close();
 		} catch (FileNotFoundException e) {
 
+			@SuppressWarnings("unused")
 			boolean projects = (new File(userPath
 					+ "/Documents/DmelanoNMJ/Projects/")).mkdirs();
+			@SuppressWarnings("unused")
 			boolean submission = (new File(userPath
 					+ "/Documents/DmelanoNMJ/Submission/")).mkdirs();
+			@SuppressWarnings("unused")
 			boolean resources = (new File(userPath
 					+ "/Documents/DmelanoNMJ/XSrc/")).mkdirs();
 			File file = new File(userPath
-					+ "/Documents/DmelanoNMJ/XSrc/log.txt");
+					+ "/Documents/DmelanoNMJ/XSrc/DmelanoNMJ.init");
 
 			Date dNow = new Date();
 			SimpleDateFormat ft = new SimpleDateFormat(
@@ -61,7 +62,7 @@ public class DmelanoNMJ {
 			fw = new FileWriter(file.getAbsoluteFile());
 
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write("DmelanoNMJ Log");
+			bw.write("DmelanoNMJ Parameters");
 			bw.newLine();
 			bw.write("Created on " + ft.format(dNow) + ".");
 			bw.flush();
@@ -75,35 +76,11 @@ public class DmelanoNMJ {
 		xsrcPath = userPath + "/Documents/DmelanoNMJ/XSrc/";
 
 		// Initialise UI
-		new Display().start();
-
-		/*
-		 * JPEGopener img = new JPEGopener(submissionPath + "/MaxInt_lsm1.jpg");
-		 * 
-		 * ImagePlus imgMax = img.getImage();
-		 * 
-		 * CaReleaseMap map = new CaReleaseMap(imgMax, LOWRES); interMap =
-		 * map.getInterMap(); components = map.getComponents();
-		 * 
-		 * SimpleGUI gui = new SimpleGUI(imgMax, LOWRES, map.getHLRatio());
-		 * gui.viewComponents();
-		 * 
-		 * StackOpener opener = new StackOpener(submissionPath +
-		 * "/Stack_lsm1.txt"); ShortStack stack = opener.getShortStack();
-		 * stack.setThreads(8); stack.setComponents(components);
-		 * stack.setBaseInterval(10000); stack.adjust(Adjust.ACC);
-		 * 
-		 * Fly fly1 = new Fly("Fly1", components, stack.getGraphVals());
-		 * fly1.compressGraph(2000);
-		 * 
-		 * File file = new File(projectPath + "testP/fly1.fly"); Exporter ex =
-		 * new Exporter(file); ex.save(fly1); Importer im = new Importer(file);
-		 * Fly a=(Fly) im.load();
-		 */
-
-		System.out.println("End");
-		// System.exit(0);
-
+		
+		
+		Display d = new Display();
+		d.start();
+	
 	}
 
 }

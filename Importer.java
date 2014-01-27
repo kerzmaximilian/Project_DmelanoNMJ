@@ -1,4 +1,6 @@
 package Util;
+
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,11 +8,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
 public class Importer {
 
 	private File fileFly;
 	private File fileImg;
 	private boolean succLoad = false;
+	private boolean imgT = false;
+	private String imgN;
 
 	// CONSTRUCTORS
 	public Importer(File fileFly) {
@@ -93,8 +99,11 @@ public class Importer {
 
 				if (fTit == true)
 					fly.setTitle(line);
-				if (fImgTit == true)
+				if (fImgTit == true) {
 					fly.setImgTitle(line);
+					imgT = true;
+					imgN=line;
+				}
 				if (fNotes == true)
 					fly.setNotes(line);
 				if (fComps == true) {
@@ -114,6 +123,27 @@ public class Importer {
 
 		} catch (FileNotFoundException e) {
 			throw new IllegalArgumentException("File was not found.");
+		}
+
+		// add image
+		if (imgT == true) {
+
+			String iPath = fileFly.getPath();
+			String[] iAPath = iPath.split("/");
+			iAPath[iAPath.length - 1] = imgN;
+			iPath = iAPath[0];
+			for (int i = 1; i < iAPath.length; i++) {
+				iPath += "/" + iAPath[i];
+			}
+			this.fileImg = new File(iPath);
+			try {
+				BufferedImage image = ImageIO.read(fileImg);
+				fly.setImg(image);
+				// Do something with the image.
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
 
 		// add components
@@ -193,16 +223,16 @@ public class Importer {
 		}
 
 		// fly.getSummary();
-		System.out.print("IMPORTER: " + fly.getTitle() + " loaded.");
+		System.out.println("IMPORTER: " + fly.getTitle() + " loaded.");
 		if (succLoad == false)
 			System.out.println("IMPORTER: Warning. File may be corrupted.");
 
 		return fly;
 
 	}
-	
-	//GETTERS
-	public boolean getStatus(){
+
+	// GETTERS
+	public boolean getStatus() {
 		return succLoad;
 	}
 }

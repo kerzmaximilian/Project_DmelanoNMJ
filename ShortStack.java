@@ -1,5 +1,4 @@
 package Util;
-import java.util.Arrays;
 
 public class ShortStack extends Thread {
 
@@ -193,6 +192,7 @@ public class ShortStack extends Thread {
 		}
 	}
 
+	@SuppressWarnings("null")
 	public short getPixVal(int imgNo, int pixNo) {
 		if ((imgNo < size) && (imgNo > -1) && (pixNo < pix) && (pixNo > -1)) {
 			if ((trueValue == false) && (baseline == true)) {
@@ -207,6 +207,7 @@ public class ShortStack extends Thread {
 		}
 	}
 
+	@SuppressWarnings("null")
 	public short getPixVal(int imgNo, int coY, int coX) {
 		if ((imgNo < size) && (imgNo > -1) && (coX < resX) && (coY < resY)) {
 			if ((trueValue == false) && (baseline == true)) {

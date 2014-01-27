@@ -1,7 +1,5 @@
 package Util;
 
-
-import ij.IJ;
 import ij.ImagePlus;
 import ij.io.Opener;
 

@@ -1,4 +1,5 @@
 package Util;
+
 import java.awt.Image;
 import java.util.Arrays;
 
@@ -6,7 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
+@SuppressWarnings("unused")
 @XmlRootElement(namespace = "Fly")
 // @XmlType(propOrder = { "title", "imgTitle", "img", "notes", "components",
 // "graphData" })
@@ -14,14 +15,16 @@ public class Fly {
 
 	private String title;
 	private Image highRes;
+	private Image tempImg;
 	private String imgTitle;
 	private String notes;
 
+	private int pixelDen;
 	private int[][] components;
-	private int compNo;
 	private short[][] graphVals;
 	private short[][] graphData;
 	private short[][] compressed;
+	private int[][] compressedInt;
 	private short[][] trueVals;
 
 	private String[] summary = { "FLY: SUMMARY", "FLY: Title:\t",
@@ -36,20 +39,12 @@ public class Fly {
 
 	public Fly(int[][] comps) {
 		this.components = comps;
-		compNo = 0;
-		for (int i = 0; i < components.length; i++) {
-			compNo += components[i].length / 2;
-		}
 		generateGraphData();
 	}
 
 	public Fly(String title, int[][] comps) {
 		this.title = title;
 		this.components = comps;
-		compNo = 0;
-		for (int i = 0; i < components.length; i++) {
-			compNo += components[i].length / 2;
-		}
 		generateGraphData();
 	}
 
@@ -58,10 +53,6 @@ public class Fly {
 		this.highRes = hRes;
 		this.imgTitle = "MaxInt_" + title;
 		this.components = comps;
-		compNo = 0;
-		for (int i = 0; i < components.length; i++) {
-			compNo += components[i].length / 2;
-		}
 		generateGraphData();
 	}
 
@@ -69,10 +60,6 @@ public class Fly {
 		this.title = title;
 		this.components = comps;
 		this.graphVals = graphVals;
-		compNo = 0;
-		for (int i = 0; i < components.length; i++) {
-			compNo += components[i].length / 2;
-		}
 		generateGraphData();
 	}
 
@@ -81,10 +68,6 @@ public class Fly {
 		this.highRes = hRes;
 		this.components = comps;
 		this.graphVals = graphVals;
-		compNo = 0;
-		for (int i = 0; i < components.length; i++) {
-			compNo += components[i].length / 2;
-		}
 		generateGraphData();
 	}
 
@@ -96,10 +79,6 @@ public class Fly {
 		this.components = comps;
 		this.graphVals = graphVals;
 		this.trueVals = trueVals;
-		compNo = 0;
-		for (int i = 0; i < components.length; i++) {
-			compNo += components[i].length / 2;
-		}
 		generateGraphData();
 	}
 
@@ -131,8 +110,9 @@ public class Fly {
 	public void compressGraph(int pixDensity) {
 
 		if (graphData != null) {
-			int pixelDen = graphData[0].length / pixDensity + 1;
+		 pixelDen = graphData[0].length / pixDensity + 1;
 			compressed = new short[graphData.length][pixDensity];
+			compressedInt = new int[graphData.length][pixDensity];
 
 			for (int i = 0; i < graphData.length; i++) {
 
@@ -142,6 +122,7 @@ public class Fly {
 							Arrays.copyOfRange(graphData[i], j * pixelDen, j
 									* pixelDen + pixelDen));
 					compressed[i][j] = math.getMean();
+					compressedInt[i][j] = math.getMean();
 				}
 			}
 
@@ -185,6 +166,10 @@ public class Fly {
 
 	public short[][] getCompressed() {
 		return compressed;
+	}
+
+	public int[][] getCompressedInt() {
+		return compressedInt;
 	}
 
 	public short[][] getTrueVals() {
@@ -238,10 +223,6 @@ public class Fly {
 
 	public void setComponents(int[][] comps) {
 		this.components = comps;
-		compNo = 0;
-		for (int i = 0; i < components.length; i++) {
-			compNo += components[i].length / 2;
-		}
 		generateGraphData();
 	}
 
@@ -260,6 +241,11 @@ public class Fly {
 
 	public void setTrueVals(short[][] vals) {
 		this.trueVals = vals;
+	}
+
+	public String getGraphRatio() {
+		String ratio = "1:"+String.valueOf(pixelDen);
+		return ratio;
 	}
 
 }

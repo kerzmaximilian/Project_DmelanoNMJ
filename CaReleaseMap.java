@@ -1,5 +1,4 @@
 package Util;
-import java.awt.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -14,7 +13,6 @@ public class CaReleaseMap {
 	private static int HLRATIO;
 
 	private ImagePlus imgMax;
-	private ImagePlus imgMin;
 
 	private int maxPixCount, maxPixH, maxPixW;
 
@@ -22,8 +20,8 @@ public class CaReleaseMap {
 	private char[] interMap;
 	private int[][] connectedComponents;
 
-	CaReleaseMap(ImagePlus imgMax, int LOWRESOLUTION) {
-		this.LOWRESOLUTION = LOWRESOLUTION;
+	@SuppressWarnings("static-access")
+	public CaReleaseMap(ImagePlus imgMax, int LOWRESOLUTION) {
 		this.imgMax = imgMax;
 		ImageProcessor ipMax = this.imgMax.getProcessor();
 		// is byte processing faster?
@@ -139,7 +137,7 @@ public class CaReleaseMap {
 		}
 		Arrays.sort(meanSort);
 		int nill = meanSort[0];
-		int range = meanSort[meanSort.length - 1] - meanSort[0];
+		//int range = meanSort[meanSort.length - 1] - meanSort[0];
 		meanSort = null;
 
 		for (int i = 0; i < islandMap.length; i++) {

@@ -1,10 +1,7 @@
 package Util;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import ij.*;
 import ij.process.ShortProcessor;
@@ -30,8 +27,8 @@ public class StackOpener {
 				line = br.readLine();
 				// header
 				if (line.contains("DmelanoNMJ")) {
-					header = line.split("\\.");
-					dimensions = header[3].split(",");
+					header = line.split("Stack Size.");
+					dimensions = header[1].split(",");
 					width = Integer.parseInt(dimensions[0]);
 					height = Integer.parseInt(dimensions[1]);
 					size = Integer.parseInt(dimensions[2]);
@@ -93,6 +90,7 @@ public class StackOpener {
 
 				if (s > -1) {
 					// header
+					//System.out.println(size+" "+s+"\t"+line);
 					pixels = new short[width * height];
 					String[] inter = line.split(",");
 					for (int i = 0; i < inter.length; i++) {
