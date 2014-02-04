@@ -1,6 +1,9 @@
-package Util;
-
-
+/**
+ * Adapted from an article in TopCoder.
+ * http://community.topcoder.com/tc?module=Static&d1=match%5Feditorials&d2=srm310
+ * NB: the adaptation is very simple, not even using the obvious optimisations
+ * suggested in the test (more a simple translation to Java).
+ */
 public class RollingMedian {
     private static final int NBITS = 16;
     private int[][] tree;
@@ -16,21 +19,18 @@ public class RollingMedian {
         i    = 0;
     }
 
-//updating tree when new value is inserted
     private void justInsert( short x ) {
         for( int j = 0; j <= NBITS; ++j ) {
             ++tree[j][x];
             x /= 2; /* Note: >> carries the sign bit, >>> does not */
         }
     }
-
     private void erase( short x ) {
         for( int j = 0; j <= NBITS; ++j ) {
             --tree[j][x];
             x /= 2; /* Note: >> carries the sign bit, >>> does not */
         }
     }
-// insert new value
     public void insert( short x ) {
         if( i >= K ) erase( data[i%K] );
         data[(i++)%K] = x;
@@ -66,12 +66,12 @@ public class RollingMedian {
             for( int k = 0; k < tree[j].length; ++k ) tree[j][k] = 0;
     }
 
-   /*public static void main( String[] args ) {
+    public static void main( String[] args ) {
         int nEl = 6;
         RollingMedian median = new RollingMedian( nEl );
         for( int i = 0; i < args.length; ++i )
             median.insert( Short.parseShort( args[i] ) );
         for( int i = 0; i < nEl; ++i )
             System.out.println( "Element " + i + " = " + median.getElement( i ) );
-    }*/
+    }
 }
