@@ -22,13 +22,19 @@ public class ShortStack extends Thread {
 	private volatile int threadNo = 6;
 	private volatile int threadFin = 0;
 
-	Thread[] threads;
+	private Thread[] threads;
 
 	public ShortStack(int size, int resX, int resY) {
 		this.resX = resX;
 		this.resY = resY;
 		this.pix = resY * resX;
 		this.size = size;
+		if(size < 20000)
+			setBaseInterval(bLength/2);		
+		if (size < 10000)
+			setBaseInterval(size/5);
+		if (size < bLength)
+			setBaseInterval(600);
 		this.shortArray = new short[size][];
 		this.adjustArray = new short[size][];
 	}
@@ -133,27 +139,27 @@ public class ShortStack extends Thread {
 			for (int k = 0; k < adjustL; k++) {
 				pixLine[k] = adjustArray[k][pixel];
 			}
-		
+
 			RollingMedian rm = new RollingMedian(bLength);
 			// populate
 			for (int j = 0; j < bLength; j++) {
 				short pix = pixLine[j];
-				if(pix<0)
-					pix*=-1;
+				if (pix < 0)
+					pix *= -1;
 				rm.insert(pix);
 			}
 
 			for (int k = bLength / 2 + 1; k < adjustL - (bLength / 2 - 1); k++) {
 				short pix = pixLine[k];
-				if(pix<0)
-					pix*=-1;
+				if (pix < 0)
+					pix *= -1;
 				rm.insert(pix);
 				short bline = (short) rm.getMedian();
 				adjustArray[k][pixel] = (short) (adjustArray[k][i] - bline);
 			}
 
 			setter++;
-			percent=(int)((100f / compPix) * setter);
+			percent = (int) ((100f / compPix) * setter);
 		}
 		threadFin++;
 	}
@@ -268,10 +274,14 @@ public class ShortStack extends Thread {
 	public int imgSize() {
 		return pix;
 	}
-	
-	public int getStatus(){
-		//in percentage
+
+	public int getStatus() {
+		// in percentage
 		return percent;
+	}
+	
+	public int getBaseInterval(){
+		return bLength;
 	}
 
 	// setters
