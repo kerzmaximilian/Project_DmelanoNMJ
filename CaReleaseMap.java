@@ -1,5 +1,5 @@
 package Util;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 
 import ij.*;
@@ -47,8 +47,8 @@ public class CaReleaseMap {
 		 * 16:1 ratio 1squ = 256pix of High Res => divided into 4x4 squares each
 		 * containing 16pix
 		 * 
-		 * The mean of the 16pixel is compared to all other 15 
-		 * 16pixel squares and tested on its SD dependency. 
+		 * The mean of the 16pixel is compared to all other 15 16pixel squares
+		 * and tested on its SD dependency.
 		 */
 		int[][] pixelArray = ipMax.getIntArray();
 
@@ -137,7 +137,7 @@ public class CaReleaseMap {
 		}
 		Arrays.sort(meanSort);
 		int nill = meanSort[0];
-		//int range = meanSort[meanSort.length - 1] - meanSort[0];
+		// int range = meanSort[meanSort.length - 1] - meanSort[0];
 		meanSort = null;
 
 		for (int i = 0; i < islandMap.length; i++) {
@@ -390,124 +390,222 @@ public class CaReleaseMap {
 
 	private void computeComponents(char[] interMp) {
 		char[] interMap = interMp;
-		/*
-		 * 1. check for surrounding pixel - if present add to component - else,
-		 * new component. 2. if a component > 4pixel, and a surrounding pixel is
-		 * positive AND perpendicular, add to component - else new component.
-		 */
 
-		ArrayList<ArrayList<Integer>> caReMap = new ArrayList<ArrayList<Integer>>();
-		ArrayList<Integer> row = new ArrayList<Integer>();
-		// add all 'O's to the a list - rows
-		for (int i = 0; i < interMap.length; i++) {
-			if (interMap[i] == 'O') {
-				row.add(i % LOWRESOLUTION);
-				row.add(i / LOWRESOLUTION);
+		int[] firstPass = new int[interMap.length];
+		Arrays.fill(firstPass, 0);
+		int nextComp = 0;
+
+		// FIRST PASS
+		for (int i = 0; i < firstPass.length; i++) {
+
+			// get neighbours
+			int[] neighbours = new int[3];
+			Arrays.fill(neighbours, 0);
+			if (i > 0) {
+				if (interMap[i - 1] == 'O')
+					neighbours[0] = firstPass[i - 1];
 			}
-
-			if (i % LOWRESOLUTION == 31) {
-				caReMap.add(row);
-				row = new ArrayList<Integer>();
+			if (i > 31) {
+				if (interMap[i - 32] == 'O')
+					neighbours[1] = firstPass[i - 32];
 			}
-		}
-		// remove empty components
-		for (int i = 0; i < caReMap.size(); i++) {
-			if (caReMap.get(i).size() < 2)
-				caReMap.remove(i);
-		}
-
-		ArrayList<ArrayList<Integer>> comps = new ArrayList<ArrayList<Integer>>();
-		row = new ArrayList<Integer>();
-
-		// separate components within row
-		row = new ArrayList<Integer>();
-		for (int i = 0; i < caReMap.size(); i++) {
-			for (int j = 0; j < caReMap.get(i).size() / 2; j++) {
-				int plusOne;
-				try {
-					plusOne = caReMap.get(i).get(j * 2 + 2);
-				} catch (IndexOutOfBoundsException e) {
-					plusOne = -1;
-				}
-				if (caReMap.get(i).get(j * 2) + 1 == plusOne) {
-					row.add(caReMap.get(i).get(j * 2));
-					row.add(caReMap.get(i).get(j * 2 + 1));
-
+			if (i > 32) {
+				if (interMap[i - 33] == 'O')
+					neighbours[1] = firstPass[i - 33];
+			}
+			// lowest component or new compoenent
+			int comp = nextComp;
+			Arrays.sort(neighbours);
+			int itter = 0;
+			for (int k = 0; k < neighbours.length; k++) {
+				if (neighbours[k] != 0) {
+					comp = neighbours[k];
+					break;
 				} else {
-
-					row.add(caReMap.get(i).get(j * 2));
-					row.add(caReMap.get(i).get(j * 2 + 1));
-					comps.add(row);
-					row = new ArrayList<Integer>();
+					itter++;
 				}
+			}
+
+			// assign component number
+			if (interMap[i] == 'O') {
+				if (itter == 3) {
+					nextComp++;
+					comp = nextComp;
+				}
+				firstPass[i] = comp;
+			}
+
+		}
+
+		// SECOND PASS - generating equivalence
+		int[][] eq = new int[nextComp][1];
+
+		for (int i = 0; i < eq.length; i++)
+			eq[i][0] = i + 1;
+
+		for (int i = LOWRESOLUTION; i < firstPass.length - 2 * LOWRESOLUTION; i++) {
+
+			int[] neighbours = new int[8];
+			Arrays.fill(neighbours, 0);
+
+			if (firstPass[i] != 0) {
+
+				// get neighbours
+				// upper row
+				if ((i - LOWRESOLUTION - 1 >= 0)
+						&& ((i - LOWRESOLUTION - 1) % 32 < 31))
+					neighbours[0] = firstPass[i - LOWRESOLUTION - 1];
+				neighbours[1] = firstPass[i - LOWRESOLUTION];
+				if ((i - LOWRESOLUTION + 1) % 32 > 0)
+					neighbours[2] = firstPass[i - LOWRESOLUTION + 1];
+
+				// mid row
+				if ((i - 1) % 32 < 31)
+					neighbours[3] = firstPass[i - 1];
+				if ((i + 1) % 32 > 0)
+					neighbours[4] = firstPass[i + 1];
+
+				// bottom row
+				if ((i + LOWRESOLUTION - 1) % 32 < 31)
+					neighbours[5] = firstPass[i + LOWRESOLUTION - 1];
+				neighbours[6] = firstPass[i + LOWRESOLUTION];
+				if ((i + LOWRESOLUTION + 1) % 32 > 0)
+					neighbours[7] = firstPass[i + LOWRESOLUTION + 1];
+			}
+
+			Arrays.sort(neighbours);
+
+			for (int k = 0; k < neighbours.length; k++) {
+
+				if (neighbours[k] != 0) {
+
+					boolean present = false;
+
+					for (int h = 0; h < eq[firstPass[i] - 1].length; h++) {
+
+						if (eq[firstPass[i] - 1][h] == neighbours[k])
+							present = true;
+					}
+
+					if (present == false) {
+						int[] inter = new int[eq[firstPass[i] - 1].length + 1];
+						for (int h = 0; h < eq[firstPass[i] - 1].length; h++) {
+							inter[h] = eq[firstPass[i] - 1][h];
+						}
+						inter[inter.length - 1] = neighbours[k];
+						eq[firstPass[i] - 1] = inter;
+					}
+
+				}
+			}
+
+		}
+
+		// generating component's eqiovalence
+
+		for (int i = 0; i < eq.length; i++) {
+
+			if (eq[i].length > 1) {
+
+				for (int j = 0; j < eq[i].length; j++) {
+
+					for (int k = 0; k < eq[eq[i][j] - 1].length; k++) {
+
+						boolean present = false;
+
+						for (int h = 0; h < eq[i].length; h++) {
+
+							if (eq[eq[i][j] - 1][k] == eq[i][h])
+								present = true;
+						}
+
+						if (present == false) {
+
+							int[] inter = new int[eq[i].length + 1];
+							for (int h = 0; h < eq[i].length; h++) {
+								inter[h] = eq[i][h];
+							}
+							inter[inter.length - 1] = eq[eq[i][j] - 1][k];
+							eq[i] = inter;
+						}
+
+					}
+				}
+
+				Arrays.sort(eq[i]);
 			}
 		}
 
-		ArrayList<ArrayList<Integer>> comps2 = new ArrayList<ArrayList<Integer>>();
-		ArrayList<Integer> interm = new ArrayList<Integer>();
-		boolean added = false;
-
-		while (comps.size() > 0) {
-			interm = comps.get(0);
-			comps.remove(0);
-			int x, y;
-
-			do {
-				for (int i = 0; i < comps.size(); i++) {
-					if (comps.size() < 2) {
-						break;
+		
+		//Removing double
+		int [][]equivalence = new int[0][];
+		
+		for(int i = 0; i<eq.length; i++){
+			
+			boolean present = false;
+			
+			for(int j=0; j<equivalence.length; j++){
+				
+				if(eq[i][0] == equivalence[j][0])
+					present = true;
+			}
+			
+			if(present ==false){
+				int[][] inter = new int[equivalence.length+1][];
+				for(int j = 0; j<equivalence.length; j++){
+					inter[j] = equivalence[j];
+				}
+				inter[inter.length-1] = eq[i];
+				equivalence = inter;
+			}
+			
+		}		
+		
+		//THIRD PASSes - obtaining coordinates
+		int[][] comps = new int[equivalence.length][];
+		
+		for(int i = 0; i<equivalence.length; i++){
+			
+			for(int j = 0; j<firstPass.length; j++){
+				
+				if(firstPass[j]>0){
+					
+					boolean present = false;
+					
+					for(int k = 0; k<equivalence[i].length; k++){
+						if(equivalence[i][k]==firstPass[j])
+						present = true;		
 					}
-					for (int j = 0; j < comps.get(i).size() / 2; j++) {
-						y = comps.get(i).get(j * 2);
-						x = comps.get(i).get(j * 2 + 1);
-						for (int l = 0; l < interm.size() / 2; l++) {
-
-							if ((interm.get(l * 2) == y)
-									&& (interm.get(l * 2 + 1) + 1 == x)) {
-								for (int k = 0; k < comps.get(i).size(); k++) {
-									interm.add(comps.get(i).get(k));
-								}
-								added = true;
-								comps.remove(i);
-								break;
-
-							} else {
-								added = false;
-							}
+					
+					if(present == true){
+						
+						if(comps[i]==null){
+							comps[i] = new int[2];
+							comps[i][0] = j%LOWRESOLUTION;
+							comps[i][1] = j/LOWRESOLUTION;
+							
+						} else {
+						
+						int[] inter = comps[i];
+						comps[i] = new int[inter.length+2];
+						for(int k = 0; k<inter.length; k++){
+							comps[i][k] = inter[k];
+						}
+						comps[i][comps[i].length-2] = j%LOWRESOLUTION;
+						comps[i][comps[i].length-1] = j/LOWRESOLUTION;
+						
 						}
 					}
+					
 				}
-			} while ((added == true) && (comps.size() > 1));
-
-			if ((interm.size() > 1) && (added == false)) {
-				comps2.add(interm);
-				interm = new ArrayList<Integer>();
+				
 			}
+			
 		}
+		
+		connectedComponents = comps;
 
-		// remove empty components
-		for (int i = 0; i < comps2.size(); i++) {
-			if (comps2.get(i).size() < 2)
-				comps2.remove(i);
-		}
 
-		connectedComponents = new int[comps2.size()][];
-		for (int i = 0; i < comps2.size(); i++) {
-			connectedComponents[i] = new int[comps2.get(i).size()];
-			for (int j = 0; j < comps2.get(i).size(); j++) {
-				connectedComponents[i][j] = comps2.get(i).get(j);
-			}
-		}
-
-		/*
-		 * System.err.print("Diagnostics: Connected Components.");
-		 * System.out.println(); for (int i = 0; i < comps2.size(); i++) {
-		 * System.out.println("Component " + i + ": "); for (int j = 0; j <
-		 * comps2.get(i).size() / 2; j++) System.out.println("\t" +
-		 * comps2.get(i).get(j * 2) + "(" + comps2.get(i).get(j * 2) * 16 + ") "
-		 * + comps2.get(i).get(j * 2 + 1) + " (" + comps2.get(i).get(j * 2 + 1)
-		 * * 16 + ")"); } System.out.println();
-		 */
 	}
 
 	// getters

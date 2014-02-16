@@ -12,7 +12,8 @@ public class ShortStack extends Thread {
 	private int resY;
 	private int pix;
 	private int size;
-	private int bLength = 7999;
+	private int bLength = 3600;
+	private int bLPer = 10;
 	private int compPix;
 	private volatile int setter = 0;
 	private volatile int percent = 0;
@@ -29,10 +30,6 @@ public class ShortStack extends Thread {
 		this.resY = resY;
 		this.pix = resY * resX;
 		this.size = size;
-		if(size < 20000)
-			setBaseInterval(bLength/2);		
-		if (size < 10000)
-			setBaseInterval(size/5);
 		if (size < bLength)
 			setBaseInterval(600);
 		this.shortArray = new short[size][];
@@ -94,6 +91,7 @@ public class ShortStack extends Thread {
 				}
 			}
 			baseline = true;
+			
 			System.out.println("SHORTSTACK: Pixel Values adjusted.");
 		} else {
 			System.err
@@ -145,17 +143,21 @@ public class ShortStack extends Thread {
 			for (int j = 0; j < bLength; j++) {
 				short pix = pixLine[j];
 				if (pix < 0)
-					pix *= -1;
+					pix = (short) -pix;
 				rm.insert(pix);
 			}
 
 			for (int k = bLength / 2 + 1; k < adjustL - (bLength / 2 - 1); k++) {
 				short pix = pixLine[k];
 				if (pix < 0)
-					pix *= -1;
+					pix = (short) -pix;
 				rm.insert(pix);
-				short bline = (short) rm.getMedian();
-				adjustArray[k][pixel] = (short) (adjustArray[k][i] - bline);
+				//get 100/bLPer element
+				short bline = (short) rm.getElement((int)(bLength*100/bLPer));
+				short aArray = adjustArray[k][i];
+				if(aArray <0)
+					aArray =(short) -aArray;
+				adjustArray[k][pixel] = (short) (aArray - bline);
 			}
 
 			setter++;
@@ -237,8 +239,8 @@ public class ShortStack extends Thread {
 
 			for (int i = 0; i < graphVals.length; i++) {
 				int pixel = compList[i][0] * 31 + compList[i][1];
-				for (int j = bLength / 2; j < graphVals[i].length
-						- (bLength / 2 - 1); j++) {
+				for (int j = bLength / 2; j < adjustArray.length
+						- (bLength / 2)-1; j++) {
 					graphVals[i][j - bLength / 2] = adjustArray[j][pixel];
 				}
 			}
@@ -318,6 +320,10 @@ public class ShortStack extends Thread {
 
 	public void setThreads(int threads) {
 		this.threadNo = threads;
+	}
+	
+	public void setBaseIntervalPercentage(int x){
+		bLPer = x;
 	}
 
 }

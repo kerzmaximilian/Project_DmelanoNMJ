@@ -110,13 +110,13 @@ public class Fly {
 	public void compressGraph(int pixDensity) {
 
 		if (graphData != null) {
-		 pixelDen = graphData[0].length / pixDensity + 1;
+		 pixelDen = graphData[0].length / pixDensity+1;
 			compressed = new short[graphData.length][pixDensity];
 			compressedInt = new int[graphData.length][pixDensity];
 
 			for (int i = 0; i < graphData.length; i++) {
 
-				for (int j = 0; j < graphData[i].length / pixelDen; j++) {
+				for (int j = 0; j < graphData[i].length / pixelDen ; j++) {
 
 					MathCalc math = new MathCalc(
 							Arrays.copyOfRange(graphData[i], j * pixelDen, j
@@ -124,6 +124,17 @@ public class Fly {
 					compressed[i][j] = math.getMean();
 					compressedInt[i][j] = math.getMean();
 				}
+			}
+			
+			//removing tail of zeros
+			int tailNo = 0;
+			for(int i = compressed[0].length-1; i>compressed[0].length/4; i--){
+				if(compressed[0][i]==0)
+					tailNo++;
+			}
+			for(int i = 0; i<compressed.length; i++){
+			compressed[i] = Arrays.copyOf(compressed[i], compressed[i].length-tailNo);
+			compressedInt[i] = Arrays.copyOf(compressedInt[i], compressedInt[i].length-tailNo);
 			}
 
 			System.out.println("FLY: Graph Data compressed to a 1:" + pixelDen
@@ -246,6 +257,10 @@ public class Fly {
 	public String getGraphRatio() {
 		String ratio = "1:"+String.valueOf(pixelDen);
 		return ratio;
+	}
+	
+	public int getPixelDensity(){
+		return pixelDen;
 	}
 
 }

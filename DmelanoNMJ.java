@@ -1,6 +1,5 @@
 package Util;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -76,11 +75,35 @@ public class DmelanoNMJ {
 		xsrcPath = userPath + "/Documents/DmelanoNMJ/XSrc/";
 
 		// Initialise UI
-		
-		
 		Display d = new Display();
 		d.start();
-	
+
+		/*
+		 * JPEGopener img = new JPEGopener(submissionPath + "/fly1.1.jpg");
+		 * 
+		 * ImagePlus imgMax = img.getImage();
+		 * 
+		 * CaReleaseMap map = new CaReleaseMap(imgMax, LOWRES); interMap =
+		 * map.getInterMap(); components = map.getComponents();
+		 * 
+		 * 
+		 * SimpleGUI gui = new SimpleGUI(imgMax, LOWRES, map.getHLRatio());
+		 * gui.viewComponents();
+		 * 
+		 * StackOpener opener = new StackOpener(submissionPath +
+		 * "/Stack_lsm1.txt"); ShortStack stack = opener.getShortStack();
+		 * stack.setThreads(8); stack.setComponents(components);
+		 * stack.setBaseInterval(10000); stack.adjust(Adjust.ACC);
+		 * 
+		 * Fly fly1 = new Fly("Fly1", components, stack.getGraphVals());
+		 * fly1.compressGraph(2000);
+		 * 
+		 * File file = new File(projectPath + "testP/fly1.fly"); Exporter ex =
+		 * new Exporter(file); ex.save(fly1); Importer im = new Importer(file);
+		 * Fly a=(Fly) im.load();
+		 * 
+		 * System.out.println("End"); System.exit(0);
+		 */
 	}
 
 }

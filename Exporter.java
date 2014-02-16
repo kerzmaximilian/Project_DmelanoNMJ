@@ -20,6 +20,7 @@ public class Exporter {
 	private boolean graphValsBoo = false;
 	private boolean trueValsBoo = false;
 	private float percent = 0;
+	private String assignedProject; 
 
 	public Exporter(File file) {
 
@@ -134,7 +135,7 @@ public class Exporter {
 	}
 
 	public void csv(Fly fly, Adjust adj) throws IOException {
-
+		
 		short[][] pixel;
 		String compLine = "0,";
 		if (adj == Adjust.ALL) {
@@ -170,6 +171,7 @@ public class Exporter {
 		}
 		bw.flush();
 		bw.close();
+		
 		System.out
 				.println("EXPORTER: " + fly.getTitle() + " exported as .csv.");
 	}
@@ -201,6 +203,10 @@ public class Exporter {
 
 	public void setTrueValsExport(boolean boo) {
 		trueValsBoo = boo;
+	}
+	
+	public void setProjectDest(String pro){
+		assignedProject = pro;
 	}
 
 }
